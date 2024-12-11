@@ -1,0 +1,100 @@
+<div class="main-container"[style.background-image]="'url(' + backgroundImageUrl + ')'">
+  <mat-toolbar class="weather-toolbar">
+    <div style="font-size: 40px">Weather Updates</div>
+  </mat-toolbar>
+  <div class="seacrh-box">
+    <div class="search">
+      <mat-form-field class="search-field">
+        <mat-label> Search by city name or area zip code </mat-label>
+        <input matInput [(ngModel)]="userInput" placeholder="Search by city name or area zip code" />
+      </mat-form-field>
+
+      <button class="search-button" (click)="searchWeather()">Search</button>
+    </div>
+  </div>
+  <div *ngIf="errorMessage != ''" class="weather-container">
+    <h1 class="weather-info" style="padding: 40px; width: 60%">
+      {{ errorMessage }}
+    </h1>
+  </div>
+
+  <div *ngIf="errorMessage == ''" id="weather-data-display">
+    <div *ngIf="$data | async as weatherData" class="weather-container">
+      <div class="weather-info" id="weather">
+        <div class="city-country">
+          <h2 style="margin: 0px;">{{ weatherData.name }}, {{ weatherData.country }}</h2>
+          <div style="display: flex;">
+            <p>Weather: &nbsp;</p>
+            <p style="color: #c3cbd2">
+              {{ weatherData.description | titlecase }}
+            </p>
+          </div>
+          <div style="display: flex;">
+            <p>Time: &nbsp;</p>
+            <p style="color: #c3cbd2">{{ weatherData.dt }}</p>
+          </div>
+
+        </div>
+
+        <table class="details-table">
+          <tr>
+            <th>Temperature</th>
+            <td>{{ weatherData.degTemp }}°F</td>
+          </tr>
+          <tr>
+            <th>Feels like</th>
+            <td>{{ weatherData.feelsLikeTemp }}°F</td>
+          </tr>
+          <tr>
+            <th>Visibility</th>
+            <td>{{ (weatherData.visibility / 1000 /1.6) | number:'1.0-0' }} miles</td>
+          </tr>
+          <tr>
+            <th>Wind Speed</th>
+            <td>{{ weatherData.windSpeed }} mph</td>
+          </tr>
+        </table>
+
+        <div class="forecast-cards">
+          <div *ngFor="let day of forecastDays">
+            <button mat-raised-button class="date-card" style="margin-right:10px ;">
+              <p (click)="showTimeline(day)">{{day | date:'MMM d'}}</p>
+            </button>
+          </div>
+
+        </div>
+        <div style="display: flex; margin-top: 10px;">
+
+          <mat-stepper #stepper style="background: transparent !important; justify-content: center"
+            *ngIf="timelineData != []">
+            <mat-step *ngFor="let item of timelineData; let i = index">
+              <ng-template matStepLabel>
+                <div>
+                  {{ item.dt | date : "shortTime" }}
+                </div>
+              </ng-template>
+              <div class="weather-tooltip">
+                <div class="inner-block">
+                  <div class="left-block">
+                    <div class="temp">{{ item.main.temp }} °C</div>
+                    <div class="wdesc">{{ item.weather[0].description }}</div>
+                  </div>
+                  <div class="right-block">
+                    <div>
+                      <span class="indent">Feels Like: </span>{{ item.main.feels_like }} °F
+                    </div>
+                    <div>
+                      <span class="indent">Wind Speed: </span>{{ item.wind.speed }} mph
+                    </div>
+                  </div>
+                </div>
+                <div id="tt-arrow" class="arrow" style="left: 553px"></div>
+              </div>
+            </mat-step>
+          </mat-stepper>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
